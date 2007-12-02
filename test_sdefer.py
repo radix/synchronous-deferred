@@ -186,6 +186,33 @@ class SynchronousDeferredTests(TestCase):
         sd.addCallbacks(lambda r: 1/0, failures.append)
         self.assertEquals(failures, [])
 
+    def test_addCallbacksExtraArgumentsOnCallback(self):
+        """
+        addCallbacks takes some extra arguments to pass to its callback.
+        """
+        sd = SynchronousDeferred("foo")
+        l = []
+        def cb(r, extra, more=None):
+            l.append((r, extra, more))
+        sd.addCallbacks(cb, lambda ignored: None,
+                        (1,), {},
+                        {"more": "heyo"}, {})
+        self.assertEquals(l, [("foo", 1, "heyo")])
+
+    def test_addCallbacksExtraArgumentsOnErrback(self):
+        """
+        addCallbacks takes some extra arguments to pass to its errback.
+        """
+        failure = SynchronousFailure(RuntimeError())
+        sd = SynchronousDeferred(failure)
+        l = []
+        def eb(r, extra, more=None):
+            l.append((r, extra, more))
+        sd.addCallbacks(lambda ignored: None, eb,
+                        (), (1,),
+                        {}, {"more": "heyo"})
+        self.assertEquals(l, [(failure, 1, "heyo")])
+
 
 class SynchronousFailureTests(TestCase):
     """

@@ -47,11 +47,13 @@ class SynchronousDeferred(object):
         if isinstance(self.result, SynchronousFailure):
             self._callCallback(errback, *args, **kwargs)
 
-    def addCallbacks(self, callback, errback):
+    def addCallbacks(self, callback, errback,
+                     callbackArgs=(), errbackArgs=(),
+                     callbackKwargs={}, errbackKwargs={}):
         if isinstance(self.result, SynchronousFailure):
-            self.addErrback(errback)
+            self.addErrback(errback, *errbackArgs, **errbackKwargs)
         else:
-            self.addCallback(callback)
+            self.addCallback(callback, *callbackArgs, **callbackKwargs)
 
 
 class SynchronousFailure(Exception):
