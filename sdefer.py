@@ -99,6 +99,7 @@ class SynchronousDeferred(object):
         current value is.
         """
         self._callCallback(callback, *args, **kwargs)
+        return self
 
 
 class SynchronousFailure(Exception):

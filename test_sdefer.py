@@ -220,7 +220,8 @@ class SynchronousDeferredTests(TestCase):
         addBoth adds a callback to be run on success.
         """
         l = []
-        sd = SynchronousDeferred("foo").addBoth(l.append)
+        sd = SynchronousDeferred("foo")
+        self.assertEquals(sd.addBoth(l.append), sd)
         self.assertEquals(l, ["foo"])
 
     def test_addBothSuccessExtraArgs(self):
