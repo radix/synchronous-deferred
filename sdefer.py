@@ -3,9 +3,30 @@ import sys
 
 class SynchronousDeferred(object):
     """
-    An object which is mostly compatible with
-    L{twisted.internet.defer.Deferred}, and allows a library author to easily
-    include both synchronous and asynchronous interfaces.
+    An object which is similar to L{twisted.internet.defer.Deferred}, and
+    allows a library author to easily include both synchronous and asynchronous
+    interfaces.
+
+    The notable differences between this class and C{Deferred} are thus:
+
+      - There are no C{callback} or C{errback} methods on this class. You must
+        provide the initial result to the contsructor.
+      - There is a L{synchronize} method, which returns or raises the current
+        value.
+      - There is no C{setTimeout} method, which is deprecated on the real
+        C{Deferred} anyway.
+      - There is no automatic logging of 'forgotten' failures, both to avoid
+        depending on a particular logging framework and because if you are
+        using this object, you should be calling C{synchronize} at the end,
+        which will convert any leftover failures to a synchronous exception.
+
+    The following are not implemented on this class mostly because they are
+    very rarely used and I haven't gotten around to it:
+
+      - C{chainDeferred}
+      - C{pause}
+      - C{unpause}
+
     """
     def __init__(self, result):
         """
@@ -34,18 +55,22 @@ class SynchronousDeferred(object):
     def addCallback(self, callback, *args, **kwargs):
         """
         Call C{callback} immediately with the current result if the current
-        result is not a L{SynchronousFailure}.
+        result is not a L{SynchronousFailure}. C{*args} and C{**kwargs} will
+        also be passed.
         """
         if not isinstance(self.result, SynchronousFailure):
             self._callCallback(callback, *args, **kwargs)
+        return self
 
     def addErrback(self, errback, *args, **kwargs):
         """
         Call C{errback} immediately with the current result if the current
-        result is a L{SynchronousFailure}.
+        result is a L{SynchronousFailure}. C{*args} and C{**kwargs} will also
+        be passed.
         """
         if isinstance(self.result, SynchronousFailure):
             self._callCallback(errback, *args, **kwargs)
+        return self
 
     def addCallbacks(self, callback, errback,
                      callbackArgs=(), errbackArgs=(),
@@ -54,11 +79,19 @@ class SynchronousDeferred(object):
         Call C{callback} or C{errback}, depending on whether the current result
         is a failure. If C{callback} raises an exception, C{errback} will not
         be called.
+
+        @param callbackArgs: The extra arguments to be passed to the callback.
+        @param errbackArgs: The extra arguments to be passed to the errback.
+        @param callbackKwargs: The extra keyword arguments to be passed to the
+            callback.
+        @param errbackKwargs: The extra keyword arguments to be passed to the
+            errback.
         """
         if isinstance(self.result, SynchronousFailure):
             self._callCallback(errback, *errbackArgs, **errbackKwargs)
         else:
             self._callCallback(callback, *callbackArgs, **callbackKwargs)
+        return self
 
     def addBoth(self, callback, *args, **kwargs):
         """

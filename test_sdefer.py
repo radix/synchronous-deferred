@@ -27,10 +27,11 @@ class SynchronousDeferredTests(TestCase):
 
     def test_addCallback(self):
         """
-        C{addCallback} calls the callback passed immediately.
+        C{addCallback} calls the callback passed immediately and returns itself.
         """
         l = []
-        SynchronousDeferred(None).addCallback(l.append)
+        sd = SynchronousDeferred(None)
+        self.assertEquals(sd.addCallback(l.append), sd)
         self.assertEquals(l, [None])
 
     def test_addCallbackExtraArguments(self):
@@ -72,7 +73,7 @@ class SynchronousDeferredTests(TestCase):
         failure = SynchronousFailure(RuntimeError())
         sd = SynchronousDeferred(failure)
         l = []
-        sd.addErrback(l.append)
+        self.assertEquals(sd.addErrback(l.append), sd)
         self.assertEquals(l, [failure])
 
     def test_addCallbackOnlyCalledOnSuccess(self):
@@ -160,7 +161,8 @@ class SynchronousDeferredTests(TestCase):
         sd = SynchronousDeferred("foo")
         successes = []
         failures = []
-        sd.addCallbacks(successes.append, failures.append)
+        self.assertEquals(sd.addCallbacks(successes.append, failures.append),
+                          sd)
         self.assertEquals(successes, ["foo"])
         self.assertEquals(failures, [])
 
