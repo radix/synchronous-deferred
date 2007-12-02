@@ -50,10 +50,22 @@ class SynchronousDeferred(object):
     def addCallbacks(self, callback, errback,
                      callbackArgs=(), errbackArgs=(),
                      callbackKwargs={}, errbackKwargs={}):
+        """
+        Call C{callback} or C{errback}, depending on whether the current result
+        is a failure. If C{callback} raises an exception, C{errback} will not
+        be called.
+        """
         if isinstance(self.result, SynchronousFailure):
             self.addErrback(errback, *errbackArgs, **errbackKwargs)
         else:
             self.addCallback(callback, *callbackArgs, **callbackKwargs)
+
+    def addBoth(self, callback, *args, **kwargs):
+        """
+        Call the given C{callback} with the current value, no matter what the
+        current value is.
+        """
+        self._callCallback(callback, *args, **kwargs)
 
 
 class SynchronousFailure(Exception):

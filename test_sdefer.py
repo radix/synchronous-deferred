@@ -213,6 +213,47 @@ class SynchronousDeferredTests(TestCase):
                         {}, {"more": "heyo"})
         self.assertEquals(l, [(failure, 1, "heyo")])
 
+    def test_addBothSuccess(self):
+        """
+        addBoth adds a callback to be run on success.
+        """
+        l = []
+        sd = SynchronousDeferred("foo").addBoth(l.append)
+        self.assertEquals(l, ["foo"])
+
+    def test_addBothSuccessExtraArgs(self):
+        """
+        addBoth takes extra arguments, and they get passed in the success case.
+        """
+        sd = SynchronousDeferred("foo")
+        l = []
+        def cb(r, extra, more=None):
+            l.append((r, extra, more))
+        sd.addBoth(cb, 1, more="heyo")
+        self.assertEquals(l, [("foo", 1, "heyo")])
+
+    def test_addBothFailure(self):
+        """
+        addBoth calls a callback on failure.
+        """
+        failure = SynchronousFailure(RuntimeError())
+        l = []
+        sd = SynchronousDeferred(failure).addBoth(l.append)
+        self.assertEquals(l, [failure])
+
+    def test_addBothFailureExctraArgs(self):
+        """
+        addBoth adds a callback to be run on success.
+        """
+        failure = SynchronousFailure(RuntimeError())
+        sd = SynchronousDeferred(failure)
+        l = []
+        def eb(r, extra, more=None):
+            l.append((r, extra, more))
+        sd.addBoth(eb, 1, more="heyo")
+        self.assertEquals(l, [(failure, 1, "heyo")])
+
+
 
 class SynchronousFailureTests(TestCase):
     """
