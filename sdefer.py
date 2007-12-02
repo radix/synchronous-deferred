@@ -10,7 +10,7 @@ class SynchronousDeferred(object):
     The notable differences between this class and C{Deferred} are thus:
 
       - There are no C{callback} or C{errback} methods on this class. You must
-        provide the initial result to the contsructor.
+        provide the initial result to the constructor.
       - There is a L{synchronize} method, which returns or raises the current
         value.
       - There is no C{setTimeout} method, which is deprecated on the real
