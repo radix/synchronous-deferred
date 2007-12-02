@@ -56,9 +56,9 @@ class SynchronousDeferred(object):
         be called.
         """
         if isinstance(self.result, SynchronousFailure):
-            self.addErrback(errback, *errbackArgs, **errbackKwargs)
+            self._callCallback(errback, *errbackArgs, **errbackKwargs)
         else:
-            self.addCallback(callback, *callbackArgs, **callbackKwargs)
+            self._callCallback(callback, *callbackArgs, **callbackKwargs)
 
     def addBoth(self, callback, *args, **kwargs):
         """
