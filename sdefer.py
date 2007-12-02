@@ -106,6 +106,10 @@ class SynchronousFailure(Exception):
     """
     An object which supports a subset of the behavior that
     L{twisted.python.failure.Failure} provides.
+
+    Notably, there is no traceback formatting capability; the main purpose of
+    this class is to give you something to introspect (L{check}, L{trap}) or
+    convert back into a synchronous exception (L{raiseException}).
     """
     def __init__(self, value=None):
         """
@@ -121,15 +125,28 @@ class SynchronousFailure(Exception):
         self.tb = tb
 
     def check(self, *exceptionTypes):
+        """
+        Check if the exception value is an instance of any of the given
+        C{exceptionTypes}. If so, the exception type that it matches will be
+        returned. Otherwise None will be returned.
+        """
         for exceptionType in exceptionTypes:
             if isinstance(self.value, exceptionType):
                 return exceptionType
 
     def trap(self, *exceptionTypes):
+        """
+        Like L{check}, except instead of returning None, this L{Failure}
+        instance will be raised.
+        """
         exceptionType = self.check(*exceptionTypes)
         if exceptionType is None:
             raise self
         return exceptionType
 
     def raiseException(self):
+        """
+        Raise the original exception synchronously. Original traceback
+        information is maintained.
+        """
         raise type(self.value), self.value, self.tb
