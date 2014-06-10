@@ -1,5 +1,15 @@
 #SynchronousDeferred
 
+## Deprecated.
+
+This code has never been used in production, and doesn't really approach the problem properly.
+
+I strongly recommend checking out Effect, at https://github.com/radix/effect or https://pypi.python.org/pypi/effect/ instead.
+
+
+## About
+
+
 This is an alternative implementation of two classes:
 
  - twisted.internet.defer.Deferred
