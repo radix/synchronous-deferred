@@ -1,10 +1,10 @@
 #SynchronousDeferred
 
-## Deprecated.
+## Abandoned
 
 This code has never been used in production, and doesn't really approach the problem properly.
 
-I strongly recommend checking out Effect, at https://github.com/radix/effect or https://pypi.python.org/pypi/effect/ instead.
+I strongly recommend checking out Effect, at https://github.com/python-effect/effect or https://pypi.python.org/pypi/effect/ instead.
 
 
 ## About
